@@ -16,9 +16,13 @@ labels_path = tf.keras.utils.get_file("ImageNetLabels.txt", "https://storage.goo
 with open(labels_path) as f:
     labels = f.readlines()
 
-# Initialize Firebase Admin SDK
+
+
+# TODO: Initialize Firebase Admin SDK
 cred = credentials.Certificate("path/to/your/firebase/credentials.json")
 firebase_admin.initialize_app(cred, {"storageBucket": "your-firebase-storage-bucket-url"})
+
+
 
 def preprocess_image(image):
     # Resize the image to the required input shape of the model
@@ -78,8 +82,8 @@ async def upload_photo(file: UploadFile = File(...)):
 
         # Upload the photo to Firebase Storage and associate results
         results_with_url = upload_to_firebase(image, result)
-
-        # Here, you can save the results to a database or perform other processing
+        
+        # TODO: store results_with_url in a database for later retrieval
 
         return JSONResponse(content=results_with_url, status_code=200)
 
