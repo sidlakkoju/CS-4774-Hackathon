@@ -9,6 +9,8 @@ from firebase_admin import credentials, storage
 
 app = FastAPI()
 
+database = []
+
 # Load your pre-trained TensorFlow model
 model = tf.keras.applications.MobileNetV2(weights="imagenet")
 # Load the class labels used by the MobileNetV2 model
@@ -16,12 +18,11 @@ labels_path = tf.keras.utils.get_file("ImageNetLabels.txt", "https://storage.goo
 with open(labels_path) as f:
     labels = f.readlines()
 
-
-
 # TODO: Initialize Firebase Admin SDK
-cred = credentials.Certificate("path/to/your/firebase/credentials.json")
-firebase_admin.initialize_app(cred, {"storageBucket": "your-firebase-storage-bucket-url"})
-
+cred = credentials.Certificate("firebase-config.json")
+firebase_admin.initialize_app(cred, {"storageBucket": "sidandleo.appspot.com"})
+# Initialize Firebase Admin SDK using the credentials file
+# firebase_admin.initialize_app(cred)
 
 
 def preprocess_image(image):
@@ -84,6 +85,8 @@ async def upload_photo(file: UploadFile = File(...)):
         results_with_url = upload_to_firebase(image, result)
         
         # TODO: store results_with_url in a database for later retrieval
+
+        database.append(results_with_url)
 
         return JSONResponse(content=results_with_url, status_code=200)
 
