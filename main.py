@@ -92,3 +92,7 @@ async def upload_photo(file: UploadFile = File(...)):
 
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
+
+@app.get("/get-all-results/")
+async def get_all_results():
+    return JSONResponse(content=database, status_code=200)
