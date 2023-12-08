@@ -6,6 +6,8 @@ import io
 import numpy as np
 import firebase_admin
 from firebase_admin import credentials, storage
+import uuid
+
 
 app = FastAPI()
 
@@ -56,14 +58,16 @@ def upload_to_firebase(image, results):
     image_bytes = image_bytes.getvalue()
 
     # Create a unique filename, you can use any logic to generate one
-    filename = "uploaded_image.jpg"
+    filename = str(uuid.uuid4()) + ".jpg"
+    # filename = "uploaded_image.jpg"
 
     # Upload image to Firebase Storage
     bucket = storage.bucket()
     blob = bucket.blob(filename)
     blob.upload_from_string(image_bytes, content_type="image/jpeg")
+    blob.make_public()
 
-    # Get the public URL of the uploaded image
+    # Get the publicly accessible URL of the uploaded image
     image_url = blob.public_url
 
     # Associate the results with the uploaded image
