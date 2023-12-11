@@ -7,11 +7,22 @@ import numpy as np
 import firebase_admin
 from firebase_admin import credentials, storage
 import uuid
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
-
 database = []
+
+# Configure CORS
+origins = ["http://localhost:3000"]  # Replace this with the actual origin of your React app
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Load your pre-trained TensorFlow model
 model = tf.keras.applications.MobileNetV2(weights="imagenet")
@@ -23,8 +34,6 @@ with open(labels_path) as f:
 # TODO: Initialize Firebase Admin SDK
 cred = credentials.Certificate("firebase-config.json")
 firebase_admin.initialize_app(cred, {"storageBucket": "sidandleo.appspot.com"})
-# Initialize Firebase Admin SDK using the credentials file
-# firebase_admin.initialize_app(cred)
 
 
 def preprocess_image(image):
@@ -77,6 +86,7 @@ def upload_to_firebase(image, results):
 
 @app.post("/upload-photo/")
 async def upload_photo(file: UploadFile = File(...)):
+    print("RUNNING")
     try:
         # Read the image file
         contents = await file.read()
@@ -97,6 +107,8 @@ async def upload_photo(file: UploadFile = File(...)):
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
+# Test Curl Request, change path to image. 
+# curl -X POST -H "Content-Type: multipart/form-data" -F "file=@/Users/siddharthlakkoju/Downloads/shrisha.jpeg" http://localhost:8000/upload-photo/
 @app.get("/get-all-results/")
 async def get_all_results():
     return JSONResponse(content=database, status_code=200)
